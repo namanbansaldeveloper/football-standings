@@ -7,7 +7,7 @@ const leagueMap = {
     'laliga': 'PD',
     'seriea': 'SA',
     'bundes': 'BL1',
-    'ligue1': 'FL1'
+    'cl': 'CL' // Champions League
 };
 
 /**
@@ -25,7 +25,7 @@ async function loadLeague(code, tabId) {
         const stRes = await fetch(`${BASE_URL}/${code}/standings`, { headers });
         
         if (stRes.status === 429) throw new Error("Rate limit hit. Wait 60s.");
-        if (stRes.status === 403) throw new Error("League restricted on Free Tier.");
+        if (stRes.status === 403) throw new Error("This competition is restricted.");
         if (!stRes.ok) throw new Error("Error loading data.");
 
         const stData = await stRes.json();
@@ -33,7 +33,10 @@ async function loadLeague(code, tabId) {
         let tableHtml = `<table class="table table-sm table-hover mt-2">
             <thead><tr><th>#</th><th>Team</th><th>W-D-L</th><th>GD</th><th>Pts</th></tr></thead><tbody>`;
         
-        stData.standings[0].table.forEach(row => {
+        // Handling the "Total" standings table
+        const standingsTable = stData.standings[0].table;
+        
+        standingsTable.forEach(row => {
             tableHtml += `<tr>
                 <td>${row.position}</td>
                 <td><img src="${row.team.crest}" class="crest" onerror="this.style.visibility='hidden'"> ${row.team.shortName}</td>
