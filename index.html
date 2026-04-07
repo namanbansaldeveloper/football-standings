@@ -1,31 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Euro Football Tracker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container"><span class="navbar-brand">Live League Standings</span></div>
-    </nav>
+<div class="container">
+    <ul class="nav nav-pills mb-3 justify-content-center" id="pills-tab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pl">Premier League</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#laliga">La Liga</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#seriea">Serie A</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#bundes">Bundesliga</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#ligue1">Ligue 1</button></li>
+    </ul>
 
-    <div class="container">
-        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pl">Premier League</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#laliga">La Liga</button></li>
-            </ul>
-
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="pl">
-                <h3>Standings</h3>
-                <div id="pl-table">Loading...</div>
-                <h3 class="mt-4">Top Scorers</h3>
-                <div id="pl-scorers">Loading...</div>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="pl">
+            <div class="row">
+                <div class="col-md-8"><h3>Standings</h3><div id="pl-table">Loading...</div></div>
+                <div class="col-md-4"><h3>Top Scorers</h3><div id="pl-scorers">Loading...</div></div>
             </div>
-            </div>
-    </div>
+        </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+        <div class="tab-pane fade" id="laliga">
+            <div class="row">
+                <div class="col-md-8"><h3>Standings</h3><div id="laliga-table">Loading...</div></div>
+                <div class="col-md-4"><h3>Top Scorers</h3><div id="laliga-scorers">Loading...</div></div>
+            </div>
+        </div>
+
+        </div>
+</div>
