@@ -1,7 +1,7 @@
 const API_KEY = '40b3199e32604ef18db495c325f73be4';
 const BASE_URL = 'https://api.football-data.org/v4/competitions';
 
-// Map the tab IDs from HTML to the API league codes
+// Map tab IDs to API competition codes
 const leagueMap = {
     'pl': 'PL',
     'laliga': 'PD',
@@ -11,23 +11,27 @@ const leagueMap = {
 };
 
 /**
- * Main function to fetch and render data for a league
+ * Fetch and Display data
  */
-async function loadLeagueData(code, tabId) {
-    const tableContainer = document.getElementById(`${tabId}-table`);
-    const scorersContainer = document.getElementById(`${tabId}-scorers`);
+async function loadLeague(code, tabId) {
+    const tableDiv = document.getElementById(`${tabId}-table`);
+    const scorersDiv = document.getElementById(`${tabId}-scorers`);
     const headers = { 'X-Auth-Token': API_KEY };
 
-    console.log(`Initiating fetch for ${code}...`);
+    console.log(`Requesting: ${code}`);
 
     try {
-        // 1. Get Standings
+        // 1. Fetch Standings
         const stRes = await fetch(`${BASE_URL}/${code}/standings`, { headers });
-        if (!stRes.ok) throw new Error(`Status: ${stRes.status}`);
+        
+        if (stRes.status === 429) throw new Error("Rate limit hit. Wait 60s.");
+        if (stRes.status === 403) throw new Error("League restricted on Free Tier.");
+        if (!stRes.ok) throw new Error("Error loading data.");
+
         const stData = await stRes.json();
         
-        let tableHtml = `<table class="table table-sm table-hover border">
-            <thead class="table-light"><tr><th>#</th><th>Team</th><th>W-D-L</th><th>GD</th><th>Pts</th></tr></thead><tbody>`;
+        let tableHtml = `<table class="table table-sm table-hover mt-2">
+            <thead><tr><th>#</th><th>Team</th><th>W-D-L</th><th>GD</th><th>Pts</th></tr></thead><tbody>`;
         
         stData.standings[0].table.forEach(row => {
             tableHtml += `<tr>
@@ -38,45 +42,45 @@ async function loadLeagueData(code, tabId) {
                 <td><strong>${row.points}</strong></td>
             </tr>`;
         });
-        tableContainer.innerHTML = tableHtml + `</tbody></table>`;
+        tableDiv.innerHTML = tableHtml + `</tbody></table>`;
 
-        // 2. Get Top Scorers
+        // 2. Fetch Scorers
         const scRes = await fetch(`${BASE_URL}/${code}/scorers`, { headers });
         const scData = await scRes.json();
         
-        let scorerHtml = `<ul class="list-group">`;
+        let scorerHtml = `<ul class="list-group list-group-flush mt-2">`;
         scData.scorers.slice(0, 10).forEach(s => {
             scorerHtml += `<li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>${s.player.name}<br><small class="text-muted">${s.team.shortName}</small></span>
                 <span class="badge bg-primary rounded-pill">${s.goals}</span>
             </li>`;
         });
-        scorersContainer.innerHTML = scorerHtml + `</ul>`;
+        scorersDiv.innerHTML = scorerHtml + `</ul>`;
 
     } catch (err) {
-        console.error("Error fetching data:", err);
-        tableContainer.innerHTML = `<div class="alert alert-warning">API limit reached or league restricted. Try again in 60 seconds.</div>`;
-        scorersContainer.innerHTML = "";
+        console.error(err);
+        tableDiv.innerHTML = `<div class="alert alert-warning py-2 small">${err.message}</div>`;
+        scorersDiv.innerHTML = "";
     }
 }
 
 /**
- * App Initialization
+ * App Setup
  */
 document.addEventListener('DOMContentLoaded', () => {
-    // Load Premier League by default
-    loadLeagueData('PL', 'pl');
+    // Initial Load: Premier League
+    loadLeague('PL', 'pl');
 
-    // Attach listeners to tabs for other leagues
+    // Handle Tab Clicks
     const tabs = document.querySelectorAll('button[data-bs-toggle="pill"]');
     tabs.forEach(tab => {
         tab.addEventListener('shown.bs.tab', (e) => {
-            const targetTabId = e.target.getAttribute('data-bs-target').replace('#', '');
-            const apiCode = leagueMap[targetTabId];
+            const targetId = e.target.getAttribute('data-bs-target').replace('#', '');
+            const code = leagueMap[targetId];
             
-            // Only load if the content is still "Loading..." to save API requests
-            if (document.getElementById(`${targetTabId}-table`).innerText === "Loading...") {
-                loadLeagueData(apiCode, targetTabId);
+            // Only fetch if content hasn't been loaded yet
+            if (document.getElementById(`${targetId}-table`).innerText === "Loading...") {
+                loadLeague(code, targetId);
             }
         });
     });
